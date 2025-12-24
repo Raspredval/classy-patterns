@@ -1,5 +1,28 @@
 #include <classy-streams/ConsoleStreams.hpp>
+#include <classy-streams/BufferStreams.hpp>
+#include <Patterns.hpp>
 
 int main() {
-    io::cout.put("Hello, world!\n");
+    patt::Pattern
+        ptName  = patt::Alpha() % 3;
+    io::IOBufferStream
+        buff;
+
+    io::cout.put("enter name: ");
+    io::TextIO(buff)
+        .forward_from(io::std_input)
+        .go_start();
+
+    auto
+        optMatch = patt::Eval(ptName, buff);
+    if (!optMatch) {
+        io::cerr.put("failed to parse the name\n");
+        return EXIT_FAILURE;
+    }
+
+    std::string
+        strName = optMatch->GetString(buff);
+    io::cout.fmt("parsed name: \"{}\"\n", strName);
+
+    return EXIT_SUCCESS;
 }

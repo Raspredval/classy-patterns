@@ -8,7 +8,7 @@
 #include <optional>
 #include <functional>
 
-#include "IOStreams.hpp"
+#include <classy-streams/IOStreams.hpp>
 #include <string_view>
 
 namespace patt {

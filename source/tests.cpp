@@ -10,7 +10,7 @@ int main() {
 
     io::cout.put("enter name: ");
     io::TextIO(buff)
-        .forward_from(io::std_input)
+        .forward_line_from(io::std_input)
         .go_start();
 
     auto

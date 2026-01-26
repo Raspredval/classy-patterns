@@ -4,7 +4,7 @@
 
 int main() {
     patt::Pattern
-        ptName  = patt::Alpha() % 3;
+        ptName  = patt::Capt(patt::Alpha() % 3);
     io::IOBufferStream
         buff;
 
@@ -13,15 +13,17 @@ int main() {
         .forward_line_from(io::std_input)
         .go_start();
 
+    patt::CaptureList
+        captures;
     auto
-        optMatch = patt::Eval(ptName, buff);
+        optMatch = patt::Eval(ptName, buff, captures);
     if (!optMatch) {
         io::cerr.put("failed to parse the name\n");
         return EXIT_FAILURE;
     }
 
     std::string
-        strName = optMatch->GetString(buff);
+        strName = captures.back().GetString(buff);
     io::cout.fmt("parsed name: \"{}\"\n", strName);
 
     return EXIT_SUCCESS;

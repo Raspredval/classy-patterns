@@ -341,14 +341,10 @@ namespace patt {
                 else
                     is.SetPosition(iBegin);
                 
-                local_captures.clear();
-                optMatch        = this->rhs->Eval(is, local_captures, usr_val);
+                optMatch        = this->rhs->Eval(is, captures, usr_val);
                 if (optMatch) {
                     intptr_t
                         iEnd    = is.GetPosition();
-                    for (const auto& m : local_captures) {
-                        captures.push_back(m);
-                    }
                     return Match{ iBegin, iEnd };
                 }
                 else {

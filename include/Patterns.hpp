@@ -107,6 +107,8 @@ namespace patt {
 
     using OptMatch =
         std::optional<Match>;
+    using CaptureList =
+        std::vector<Match>;
 
     namespace __impl {
         class Pattern {
@@ -116,7 +118,7 @@ namespace patt {
             virtual ~Pattern()      = default;
 
             OptMatch
-            Eval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val = {}) const {
+            Eval(io::IStream& is, CaptureList& captures, const std::any& usr_val = {}) const {
                 return (this->bNegated)
                     ? this->negEval(is, captures, usr_val)
                     : this->normEval(is, captures, usr_val);
@@ -137,10 +139,10 @@ namespace patt {
         
         protected:
             virtual OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const = 0;
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const = 0;
 
             virtual OptMatch
-            negEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const {
+            negEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const {
                 intptr_t
                     iCurr   = is.GetPosition();
                 auto
@@ -178,7 +180,7 @@ namespace patt {
 
         private:
             OptMatch
-            normEval(io::IStream &is, std::vector<Match>&, const std::any&) const override {
+            normEval(io::IStream &is, CaptureList&, const std::any&) const override {
                 intptr_t
                     iBegin  = is.GetPosition();
         
@@ -213,7 +215,7 @@ namespace patt {
 
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>&, const std::any&) const override {
+            normEval(io::IStream& is, CaptureList&, const std::any&) const override {
                 intptr_t
                     iBegin  = is.GetPosition();
                 auto optc   = is.Read();
@@ -244,7 +246,7 @@ namespace patt {
         
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 auto
                     optLhs  = this->lhs->Eval(is, captures, usr_val);
                 if (!optLhs)
@@ -293,7 +295,7 @@ namespace patt {
         
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>&, const std::any&) const override {
+            normEval(io::IStream& is, CaptureList&, const std::any&) const override {
                 intptr_t
                     iBegin  = is.GetPosition();
                 
@@ -320,10 +322,10 @@ namespace patt {
         
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 intptr_t
                     iBegin      = is.GetPosition();
-                std::vector<Match>
+                CaptureList
                     local_captures;
                 OptMatch
                     optMatch    = this->lhs->Eval(is, local_captures, usr_val);
@@ -369,7 +371,7 @@ namespace patt {
             public Pattern {
         public:
             using Callback =
-                std::function<void(io::IStream&, const OptMatch&, const std::vector<Match>&, const std::any&)>;
+                std::function<void(io::IStream&, const OptMatch&, const CaptureList&, const std::any&)>;
 
             template<typename Fn> requires
                 std::is_constructible_v<Callback, Fn>
@@ -385,7 +387,7 @@ namespace patt {
         
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 OptMatch
                     optMatch    = this->pattern->Eval(is, captures, usr_val);
                 this->fnCallback(is, optMatch, captures, usr_val);
@@ -425,7 +427,7 @@ namespace patt {
         
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>&, const std::any&) const override {
+            normEval(io::IStream& is, CaptureList&, const std::any&) const override {
                 intptr_t
                     iBegin  = is.GetPosition();
                 
@@ -457,7 +459,7 @@ namespace patt {
 
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 intptr_t
                     iBegin  = is.GetPosition();
                 for (size_t i = 0; i != this->uCount; ++i) {
@@ -480,7 +482,7 @@ namespace patt {
             }
 
             OptMatch
-            negEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            negEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 intptr_t
                     iBegin  = is.GetPosition();
                 for (size_t i = 0; i != this->uCount; ++i) {
@@ -530,7 +532,7 @@ namespace patt {
         
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 intptr_t
                     iBegin  = is.GetPosition();
                 for (size_t i = 0; i != this->uCount; ++i) {
@@ -630,7 +632,7 @@ namespace patt {
 
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 const patt::Pattern&
                     pattern = this->itPattern->second;
                 if (pattern == nullptr)
@@ -661,7 +663,7 @@ namespace patt {
 
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 OptMatch
                     optm    = this->pattern->Eval(is, captures, usr_val);
                 if (optm)
@@ -686,7 +688,7 @@ namespace patt {
 
         private:
             OptMatch
-            normEval(io::IStream& is, std::vector<Match>& captures, const std::any& usr_val) const override {
+            normEval(io::IStream& is, CaptureList& captures, const std::any& usr_val) const override {
                 intptr_t
                     iCurr       = is.GetPosition();
                 auto
@@ -792,7 +794,7 @@ namespace patt {
 
     [[nodiscard]]
     inline OptMatch
-    Eval(const Pattern& p, io::IStream& is, std::vector<Match>& captures, const std::any& usr_val = {}) {
+    Eval(const Pattern& p, io::IStream& is, CaptureList& captures, const std::any& usr_val = {}) {
         return p->Eval(is, captures, usr_val);
     }
 }

@@ -4,7 +4,7 @@
 
 int main() {
     patt::Pattern
-        ptName  = patt::Capt(patt::Alpha() % 3);
+        ptName  = patt::Capt(patt::Alpha() % 3) >> patt::Space() % 1 >> patt::Capt(patt::Alpha() % 3);
     io::IOBufferStream
         buff;
 
@@ -22,9 +22,16 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    if (captures.size() != 2) {
+        io::cerr.put("failed to capture parts of the name\n");
+        return EXIT_FAILURE;
+    }
+    
     std::string
-        strName = captures.back().GetString(buff);
-    io::cout.fmt("parsed name: \"{}\"\n", strName);
+        strFirstName    = captures[0].GetString(buff),
+        strSecondName   = captures[1].GetString(buff);
+    io::cout.fmt("parsed first name:  \"{}\"\n", strFirstName);
+    io::cout.fmt("parsed second name: \"{}\"\n", strSecondName);
 
     return EXIT_SUCCESS;
 }

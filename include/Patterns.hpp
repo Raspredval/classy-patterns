@@ -638,38 +638,11 @@ namespace patt {
                 this->itPattern);
         }
 
-        class ForwardPattern :
+        class CapturePattern :
             public Pattern {
         public:
-            ForwardPattern(const patt::Pattern& pattern, io::OStream& refStream) :
-                pattern(pattern), refStream(refStream) {}
-
-            patt::Pattern
-            Clone() const override {
-                return std::make_shared<ForwardPattern>(*this);
-            }
-            
-        private:
-            OptMatch
-            normEval(io::IStream& is, const std::any& usr_val) const override {
-                auto
-                    optMatch    = this->pattern->Eval(is, usr_val);
-                if (optMatch)
-                    optMatch->Forward(is, this->refStream);
-                return optMatch;
-            }
-
-            patt::Pattern
-                pattern;
-            io::OStream&
-                refStream;
+            // TODO
         };
-
-        [[nodiscard]]
-        inline patt::Pattern
-        operator/(const patt::Pattern& pattern, io::OStream& refStream) {
-            return std::make_shared<ForwardPattern>(pattern, refStream);
-        }
 
         class LookAheadPattern :
             public Pattern {

@@ -94,7 +94,7 @@ namespace patt {
         }
 
         auto&
-        Concat(const Match& match) noexcept {
+        operator+=(const Match& match) noexcept {
             this->iEnd  =
                 match.iEnd;
             return *this;
@@ -255,7 +255,7 @@ namespace patt {
                 if (!optRhs)
                     return std::nullopt;
 
-                return optLhs->Concat(*optRhs);
+                return (*optLhs) += (*optRhs);
             }
 
             patt::Pattern
@@ -636,90 +636,6 @@ namespace patt {
         inline Grammar::Accessor::operator patt::Pattern() && {
             return std::make_shared<GrammarPattern>(
                 this->itPattern);
-        }
-
-        class CapturePattern :
-            public Pattern {
-        public:
-            CapturePattern(const patt::Pattern& pattern, std::string& refCapture) :
-                pattern(pattern), refCapture(refCapture) {}
-
-            patt::Pattern
-            Clone() const override {
-                return std::make_shared<CapturePattern>(*this);
-            }
-
-        private:
-            OptMatch
-            normEval(io::IStream& is, const std::any& usr_val) const override {
-                auto
-                    optMatch    = this->pattern->Eval(is, usr_val);
-                if (optMatch) {
-                    this->refCapture = 
-                        optMatch->GetString(is);
-                }
-                
-                return optMatch;
-            }
-
-            patt::Pattern
-                pattern;
-            std::string&
-                refCapture;
-        };
-
-        [[nodiscard]]
-        inline patt::Pattern
-        operator/(const patt::Pattern& pattern, std::string& refCapture) {
-            return std::make_shared<CapturePattern>(pattern, refCapture);
-        }
-
-        template<typename T, typename V>
-        concept Appendable =
-            requires (T& obj, std::decay_t<V> const& copy_ref) {
-                { obj.push_back(copy_ref) };
-            } ||
-            requires (T& obj, std::decay_t<V> && move_ref) {
-                { obj.push_back(std::move(move_ref)) };
-            };
-        
-        template<Appendable<std::string> T>
-        class CaptureListPattern :
-            public Pattern {
-        public:
-            CaptureListPattern(const patt::Pattern& pattern, T& refCaptures) :
-                pattern(pattern),
-                refCaptures(refCaptures) {}
-        
-            patt::Pattern
-            Clone() const override {
-                return std::make_shared<CaptureListPattern<T>>(*this);
-            }
-
-        private:
-            OptMatch
-            normEval(io::IStream& is, const std::any& usr_val) const override {
-                auto
-                    optMatch    = this->pattern->Eval(is, usr_val);
-                if (optMatch) {
-                    this->refCaptures.push_back(
-                        optMatch->GetString(is));
-                }
-                
-                return optMatch;
-            }
-
-            patt::Pattern
-                pattern;
-            T&
-                refCaptures;
-        };
-
-        template<Appendable<std::string> T>
-        [[nodiscard]]
-        inline patt::Pattern
-        operator/(const patt::Pattern& pattern, T& refCaptures) {
-            return std::make_shared<CaptureListPattern<T>>(pattern, refCaptures);
         }
 
         class ForwardPattern :

@@ -5,7 +5,7 @@
 int main() {
     patt::Pattern
         ptID        = (patt::Alpha() |= patt::Str("_")) >> (patt::Alnum() |= patt::Str("_")) % 0,
-        ptMacroName = patt::Str("$") >> patt::Capt(ptID) >> (patt::Str(".") >> patt::Capt(ptID)) % 0 >> patt::None();
+        ptMacroName = patt::Str("$") >> patt::Capt(patt::Capt(ptID) >> (patt::Str(".") >> patt::Capt(ptID)) % 0) >> patt::None();
 
     io::IOBufferStream
         buff;

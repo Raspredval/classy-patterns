@@ -5,10 +5,6 @@ static_assert(__cplusplus >= 202302, "requires C++23 minimum version");
 #include "Pattern.hpp"
 #include "Grammar.hpp"
 
-#ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
-#include <classy-streams/ConsoleStreams.hpp>
-#endif
-
 namespace patt {
     namespace __impl {
         class grammar;

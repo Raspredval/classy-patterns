@@ -32,6 +32,9 @@ set_target_properties(classy-patterns-shared
 target_compile_options(classy-patterns-shared
     PRIVATE
         ${CXX_WARNINGS})
+target_compile_definitions(classy-patterns-shared
+    PRIVATE
+        "$<$<CONFIG:Debug>:CLASSY_PATTERNS_TRACE_GRAMMAR>")
 target_include_directories(classy-patterns-shared
     PRIVATE
         "include/")
@@ -46,6 +49,9 @@ set_target_properties(classy-patterns-static
 target_compile_options(classy-patterns-static
     PRIVATE
         ${CXX_WARNINGS})
+target_compile_definitions(classy-patterns-static
+    PRIVATE
+        "$<$<CONFIG:Debug>:CLASSY_PATTERNS_TRACE_GRAMMAR>")
 target_include_directories(classy-patterns-static
     PRIVATE
         "include/")

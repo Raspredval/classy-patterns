@@ -15,7 +15,7 @@ namespace patt {
 
     namespace __impl {
         class pattern {
-            friend class patternList;
+            friend class patternsList;
         public:
             virtual ~pattern() = default;
 
@@ -56,9 +56,9 @@ namespace patt {
                 bNegated    = false;
         };
 
-        class patternList {
+        class patternsList {
         public:
-            patternList(const Pattern& ptRoot);
+            patternsList(const Pattern& ptRoot);
 
             void
             append(const Pattern& pt) noexcept;

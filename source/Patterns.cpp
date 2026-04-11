@@ -1,6 +1,8 @@
 #include "Patterns.hpp"
 
 #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
+#include <cstdlib>
+#include <cstring>
 #include <classy-streams/ConsoleStreams.hpp>
 #endif
 
@@ -268,12 +270,14 @@ namespace patt {
         OptMatch
         patternGrammar::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
-            std::string_view
-                strvEnvFlag     = std::string_view{ std::getenv("TRACE_GRAMMAR") };
+            const char*
+                szEnvVar        = std::getenv("TRACE_GRAMMAR");
             bool
-                bTraceGrammar   = strvEnvFlag == "true";
-            if (bTraceGrammar)
+                bTraceGrammar   = (szEnvVar != nullptr) &&
+                                    (std::strcmp(szEnvVar, "true") == 0);
+            if (bTraceGrammar) {
                 io::cout.fmt("{}:\tbegin\n", this->itPattern->first);
+            }
             #endif
 
             if (this->itPattern->second == nullptr) {

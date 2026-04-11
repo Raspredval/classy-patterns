@@ -18,7 +18,7 @@ namespace patt {
         class const_accessor {
         public:
             const_accessor(IterT itPattern) :
-                itPattern(itPattern) {}    
+                itPattern(itPattern) {}
 
             operator Pattern() const &&;
 
@@ -32,7 +32,7 @@ namespace patt {
             public const_accessor<IterT> {
         public:
             accessor(IterT itPattern) :
-                const_accessor<IterT>(itPattern) {}    
+                const_accessor<IterT>(itPattern) {}
 
             accessor&
             operator=(const Pattern& pt) && {
@@ -43,43 +43,22 @@ namespace patt {
 
         class grammar {
         public:
-            grammar() = default;    
+            grammar() = default;
 
             accessor<gramm_iter>
-            operator[](const std::string& strKey) {
-                return { this->getPatternIter(strKey) };
-            }
+            operator[](const std::string& strKey);
 
             const_accessor<const_gramm_iter>
-            operator[](const std::string& strKey) const {
-                return { this->getPatternIter(strKey) };
-            }
+            operator[](const std::string& strKey) const;
 
             operator Pattern() const;
 
         private:
             gramm_iter
-            getPatternIter(const std::string& strKey) {
-                gramm_iter
-                    itPattern   = this->mapPatterns.find(strKey);
-                if (itPattern == this->mapPatterns.end()) {
-                    itPattern   = this->mapPatterns.emplace(strKey, nullptr).first;
-                }
-
-                return itPattern;
-            }
+            getPatternIter(const std::string& strKey);
 
             const_gramm_iter
-            getPatternIter(const std::string& strKey) const {
-                const_gramm_iter
-                    itPattern   = this->mapPatterns.find(strKey);
-                if (itPattern == this->mapPatterns.end()) {
-                    throw std::out_of_range(
-                        std::string("rule \"") + strKey + std::string("\" wasn't found in the grammar"));
-                }
-
-                return itPattern;
-            }
+            getPatternIter(const std::string& strKey) const;
 
             gramm_map_type
                 mapPatterns;

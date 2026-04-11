@@ -1,5 +1,9 @@
 #include "Patterns.hpp"
 
+#ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
+#include <classy-streams/ConsoleStreams.hpp>
+#endif
+
 namespace patt {
     namespace __impl {
         patternJoin::patternJoin(const Pattern& ptA, const Pattern& ptB) :

@@ -1,9 +1,5 @@
 #include "Grammar.hpp"
 
-#ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
-#include <classy-streams/ConsoleStreams.hpp>
-#endif
-
 namespace patt {
     namespace __impl {
         accessor<gramm_iter>

@@ -268,7 +268,12 @@ namespace patt {
         OptMatch
         patternGrammar::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
-            io::cout.fmt("{}:\tbegin\n", this->itPattern->first);
+            std::string_view
+                strvEnvFlag     = std::string_view{ std::getenv("TRACE_GRAMMAR") };
+            bool
+                bTraceGrammar   = strvEnvFlag == "true";
+            if (bTraceGrammar)
+                io::cout.fmt("{}:\tbegin\n", this->itPattern->first);
             #endif
 
             if (this->itPattern->second == nullptr) {
@@ -280,20 +285,23 @@ namespace patt {
                 optm    = this->itPattern->second->Eval(istream, captures, usr_val);
 
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
-            if (optm) {
-                io::cout
-                    .put(this->itPattern->first)
-                    .put(":\tmatched (");
-                optm->ExportData(istream, io::std_output);
-                io::cout
-                    .put(")\n");
-            }
-            else {
-                io::cout
-                    .put(this->itPattern->first)
-                    .put(":\tfailed\n");
+            if (bTraceGrammar) {
+                if (optm) {
+                    io::cout
+                        .put(this->itPattern->first)
+                        .put(":\tmatched (");
+                    optm->ExportData(istream, io::std_output);
+                    io::cout
+                        .put(")\n");
+                }
+                else {
+                    io::cout
+                        .put(this->itPattern->first)
+                        .put(":\tfailed\n");
+                }
             }
             #endif
+
             return optm;
         }
 

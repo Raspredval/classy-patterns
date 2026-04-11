@@ -10,78 +10,28 @@ static_assert(__cplusplus >= 202302, "requires C++23 minimum version");
 namespace patt {
     class Match {
     public:
-        Match(intptr_t iBegin, intptr_t iEnd) :
-            iBegin(std::min(iBegin, iEnd)),
-            iEnd(std::max(iBegin, iEnd)) {}
+        Match(intptr_t iBegin, intptr_t iEnd);
 
         intptr_t
-        Begin() const noexcept {
-            return this->iBegin;
-        }
+        Begin() const noexcept;
 
         intptr_t
-        End() const noexcept {
-            return this->iEnd;
-        }
+        End() const noexcept;
 
         size_t
-        Length() const noexcept {
-            return (size_t)(this->iEnd - this->iBegin);
-        }
+        Length() const noexcept;
 
         bool
-        Empty() const noexcept {
-            return this->iBegin == this->iEnd;
-        }
+        Empty() const noexcept;
 
         Match&
-        operator+=(const Match& m) noexcept {
-            this->iEnd  = m.iEnd;
-            return *this;
-        }
+        operator+=(const Match& m) noexcept;
 
         std::string
-        GetString(io::IStream& istream) const {
-            intptr_t
-                iCurPos = istream.GetPosition();
-            std::string
-                strResult;
-            strResult.reserve(this->Length());
-                
-            istream.SetPosition(this->Begin());
-            while (istream.GetPosition() != this->End()) {
-                std::optional<std::byte>
-                    optc    = istream.Read();
-                if (!optc)
-                    break;
-
-                strResult   += (char)*optc;
-            }
-
-            istream.SetPosition(iCurPos);
-            return strResult;
-        }
+        GetString(io::IStream& istream) const;
 
         size_t
-        ExportData(io::IStream& istream, io::SerialOStream& ostream) const {
-            intptr_t
-                iCurPos = istream.GetPosition();
-            size_t
-                uCount  = 0;
-            
-            istream.SetPosition(this->Begin());
-            while (istream.GetPosition() != this->End()) {
-                std::optional<std::byte>
-                    optc    = istream.Read();
-                if (!optc)
-                    break;
-                ostream.Write(*optc);
-                uCount      += 1;
-            }
-
-            istream.SetPosition(iCurPos);
-            return uCount;
-        }
+        ExportData(io::IStream& istream, io::SerialOStream& ostream) const;
 
     private:
         intptr_t

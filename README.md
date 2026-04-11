@@ -1,2 +1,4 @@
 # classy-patterns
-making it a binary lib instead of a header only lib
+PEG-like text parsing library, heavily inspired by lpeg
+
+example implementation of a JSON parser can be found in source/tests.cpp

@@ -45,6 +45,11 @@ namespace patt {
             this->bNegated = !this->bNegated;
         }
 
+        Pattern
+        pattern::appendPattern(const Pattern& pt) noexcept {
+            return (this->ptNext = pt);
+        }
+
         patternsList::patternsList(const Pattern& ptRoot) :
             ptRoot(ptRoot),
             ptLast(ptRoot) {}

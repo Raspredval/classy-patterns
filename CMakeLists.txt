@@ -72,7 +72,7 @@ cpack_add_component(classy-patterns-binaries
     DISPLAY "binary files")
 
 add_executable(tests
-    "tests/tests.cpp")
+    "tests/json.cpp")
 target_compile_options(tests
     PRIVATE
         ${CXX_WARNINGS})

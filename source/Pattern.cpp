@@ -10,13 +10,8 @@ namespace patt {
         }
 
         Pattern
-        pattern::NextPattern() const noexcept {
-            return this->ptNext;
-        }
-
-        Pattern
         operator-(Pattern&& pt) noexcept {
-            pt->toggleNegated();
+            pt->bNegated = !pt->bNegated;
             return pt;
         }
 
@@ -40,24 +35,13 @@ namespace patt {
                 return std::nullopt;
         }
 
-        void
-        pattern::toggleNegated() noexcept {
-            this->bNegated = !this->bNegated;
-        }
-
-        Pattern
-        pattern::appendPattern(const Pattern& pt) noexcept {
-            return (this->ptNext = pt);
-        }
-
         patternsList::patternsList(const Pattern& ptRoot) :
             ptRoot(ptRoot),
             ptLast(ptRoot) {}
 
         void
         patternsList::append(const Pattern& pt) noexcept {
-            this->ptLast    =
-                this->ptLast->appendPattern(pt);
+            this->ptLast = (this->ptLast->ptNext = pt);
         }
 
         Pattern

@@ -16,6 +16,8 @@ namespace patt {
     namespace __impl {
         class pattern {
             friend class patternsList;
+            friend class patternJoin;
+            friend class patternChoice;
         public:
             virtual ~pattern() = default;
 
@@ -24,9 +26,6 @@ namespace patt {
 
             OptMatch
             Eval(io::IStream& istream, CaptureList& captures, const std::any& usr_val);
-
-            Pattern
-            NextPattern() const noexcept;
 
             // pattern negation; inverts the evaluation result of the pattern
             friend Pattern
@@ -43,13 +42,6 @@ namespace patt {
             virtual OptMatch
             negEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val);
 
-            void
-            toggleNegated() noexcept;
-
-            Pattern
-            appendPattern(const Pattern& pt) noexcept;
-
-        private:
             Pattern
                 ptNext      = nullptr;
             bool

@@ -1,8 +1,6 @@
 #include "Patterns.hpp"
 
 #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
-#include <cstdlib>
-#include <cstring>
 #include <classy-streams/ConsoleStreams.hpp>
 #endif
 
@@ -39,7 +37,7 @@ namespace patt {
                     return std::nullopt;
 
                 *optmRet    += *optmCur;
-                ptCur       = ptCur->NextPattern();
+                ptCur       = ptCur->ptNext;
             }
 
             return optmRet;
@@ -130,7 +128,7 @@ namespace patt {
                 if (optm)
                     return optm;
 
-                ptCur       = ptCur->NextPattern();
+                ptCur       = ptCur->ptNext;
                 istream.SetPosition(iBegin);
             }
 
@@ -177,8 +175,9 @@ namespace patt {
             ptRepeat(ptRepeat),
             uCount((size_t)std::abs(iCount))
         {
-            if (iCount < 0)
-                this->toggleNegated();
+            if (iCount < 0) {
+                this->bNegated  = !this->bNegated;
+            }
         }
 
         Pattern
@@ -273,8 +272,7 @@ namespace patt {
             const char*
                 szEnvVar        = std::getenv("TRACE_GRAMMAR");
             bool
-                bTraceGrammar   = (szEnvVar != nullptr) &&
-                                    (std::strcmp(szEnvVar, "true") == 0);
+                bTraceGrammar   = std::string_view{ (szEnvVar == nullptr) ? "" : szEnvVar } == "true";
             if (bTraceGrammar) {
                 io::cout.fmt("{}:\tbegin\n", this->itPattern->first);
             }

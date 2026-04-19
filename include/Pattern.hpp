@@ -11,7 +11,7 @@ namespace patt {
     }
 
     using Pattern   =
-        std::shared_ptr<__impl::pattern>;
+        std::unique_ptr<__impl::pattern>;
 
     namespace __impl {
         class pattern {

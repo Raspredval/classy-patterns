@@ -41,7 +41,7 @@ static const patt::Grammar
             g["numexp"]     = (patt::Set("+-") % -1) >> patt::Digit() % 1;
 
             g["__eval"]     = ((g["value"] % -1) >> patt::None()) /
-                [] (io::IStream& istream, const patt::OptMatch& optm, patt::CaptureList&, const std::any&) {
+                [] (io::IStream& istream, const patt::OptMatch& optm, patt::CaptureGroupList&, const std::any&) {
                     if (!optm)
                         io::cerr.fmt("failed to parse JSON at {}\n", istream.GetPosition());
                     else

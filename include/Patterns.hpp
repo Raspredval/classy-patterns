@@ -30,7 +30,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& capture_groups, const std::any& usr_val) override;
 
         private:
             patternsList
@@ -68,7 +68,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             std::string
@@ -85,7 +85,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
         };
 
         class patternChoice :
@@ -101,7 +101,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             patternsList
@@ -141,7 +141,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             std::flat_set<char, std::less<char>, std::basic_string<char>>
@@ -158,10 +158,10 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
             OptMatch
-            negEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             Pattern
@@ -186,7 +186,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             Pattern
@@ -210,7 +210,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             const_gramm_iter
@@ -218,7 +218,7 @@ namespace patt {
         };
 
         using Callback  =
-            std::function<void(io::IStream&, const OptMatch&, CaptureList&, const std::any&)>;
+            std::function<void(io::IStream&, const OptMatch&, CaptureGroupList&, const std::any&)>;
 
         class patternHandler :
             public pattern {
@@ -231,7 +231,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             Pattern
@@ -265,7 +265,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             LocaleProc
@@ -282,7 +282,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             Pattern
@@ -299,7 +299,7 @@ namespace patt {
 
         protected:
             OptMatch
-            normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) override;
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
             Pattern

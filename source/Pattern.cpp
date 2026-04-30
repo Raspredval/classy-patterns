@@ -3,10 +3,10 @@
 namespace patt {
     namespace __impl {
         OptMatch
-        pattern::Eval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        pattern::Eval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             return (this->bNegated)
-                ? this->negEval(istream, captures, usr_val)
-                : this->normEval(istream, captures, usr_val);
+                ? this->negEval(istream, groups, usr_val)
+                : this->normEval(istream, groups, usr_val);
         }
 
         Pattern
@@ -21,11 +21,11 @@ namespace patt {
         }
 
         OptMatch
-        pattern::negEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        pattern::negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iCurPos = istream.GetPosition();
             OptMatch
-                optm    = this->normEval(istream, captures, usr_val);
+                optm    = this->normEval(istream, groups, usr_val);
             if (!optm) {
                 intptr_t
                     iEndPos = istream.GetPosition();
@@ -56,14 +56,14 @@ namespace patt {
     }
 
     extern OptMatch
-    Eval(io::IStream& istream, const Pattern& pt, CaptureList& captures, const std::any& usr_val) {
-        return pt->Eval(istream, captures, usr_val);
+    Eval(io::IStream& istream, const Pattern& pt, CaptureGroupList& groups, const std::any& usr_val) {
+        return pt->Eval(istream, groups, usr_val);
     }
 
     extern OptMatch
     Eval(io::IStream& istream, const Pattern& pt, const std::any& usr_val) {
-        CaptureList
-            captures;
-        return Eval(istream, pt, captures, usr_val);
+        CaptureGroupList
+            groups = { CaptureGroup{} };
+        return Eval(istream, pt, groups, usr_val);
     }
 }

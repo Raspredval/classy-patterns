@@ -40,6 +40,8 @@ namespace patt {
 
     using OptMatch      =
         std::optional<Match>;
-    using CaptureList   =
+    using CaptureGroup  =
         std::vector<Match>;
+    using CaptureGroupList  =
+        std::vector<CaptureGroup>;
 }

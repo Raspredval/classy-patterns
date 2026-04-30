@@ -63,7 +63,7 @@ namespace patt {
     extern OptMatch
     Eval(io::IStream& istream, const Pattern& pt, const std::any& usr_val) {
         CaptureGroupList
-            groups = { CaptureGroup{} };
+            groups;
         return Eval(istream, pt, groups, usr_val);
     }
 }

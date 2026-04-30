@@ -396,6 +396,37 @@ namespace patt {
             return optm;
         }
 
+        patternCaptureManip::patternCaptureManip(CaptureManip iCmd) :
+            iCmd(iCmd) {};
+
+        Pattern
+        patternCaptureManip::Clone() const {
+            return std::make_shared<patternCaptureManip>(*this);
+        }
+
+        OptMatch
+        patternCaptureManip::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any&) {
+            intptr_t
+                iCurPos = istream.GetPosition();
+
+            switch (this->iCmd) {
+            case CaptureManip::PopGroup:
+                if (!groups.empty())
+                    groups.pop_back();
+                break;
+
+            case CaptureManip::PushGroup:
+                groups.emplace_back();
+                break;
+
+            default:
+                throw std::runtime_error(
+                    "invalid capture manip cmd");
+            }
+
+            return Match(iCurPos, iCurPos);
+        }
+
         patternLookAhead::patternLookAhead(const Pattern& ptLookAhead) :
             ptLookAhead(ptLookAhead) {}
 
@@ -485,5 +516,17 @@ namespace patt {
     extern Pattern
     Capt(const Pattern& ptCapture) {
         return std::make_shared<__impl::patternCapture>(ptCapture);
+    }
+
+    extern Pattern
+    PushCaptGr() {
+        return std::make_shared<__impl::patternCaptureManip>(
+            __impl::CaptureManip::PushGroup);
+    }
+
+    extern Pattern
+    PopCaptGr() {
+        return std::make_shared<__impl::patternCaptureManip>(
+            __impl::CaptureManip::PopGroup);
     }
 }

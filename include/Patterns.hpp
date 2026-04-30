@@ -218,7 +218,7 @@ namespace patt {
         };
 
         using Callback  =
-            std::function<void(io::IStream&, const OptMatch&, CaptureGroupList&, const std::any&)>;
+            std::function<void(io::IStream&, const OptMatch&, const CaptureGroupList&, const std::any&)>;
 
         class patternHandler :
             public pattern {
@@ -287,6 +287,28 @@ namespace patt {
         private:
             Pattern
                 ptCapture;
+        };
+
+        enum class CaptureManip {
+            PopGroup,
+            PushGroup
+        };
+
+        class patternCaptureManip :
+            public pattern {
+        public:
+            patternCaptureManip(CaptureManip iCmd);
+
+            [[nodiscard]] Pattern
+            Clone() const override;
+
+        protected:
+            OptMatch
+            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
+
+        private:
+            CaptureManip
+                iCmd;
         };
 
         class patternLookAhead :
@@ -376,4 +398,12 @@ namespace patt {
     [[nodiscard]]
     extern Pattern
     Capt(const Pattern& ptCapture);
+
+    [[nodiscard]]
+    extern Pattern
+    PushCaptGr();
+
+    [[nodiscard]]
+    extern Pattern
+    PopCaptGr();
 }

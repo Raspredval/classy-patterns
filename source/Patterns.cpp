@@ -23,7 +23,7 @@ namespace patt {
         }
 
         OptMatch
-        patternJoin::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternJoin::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             Pattern
                 ptCur   = lst.first();
             intptr_t
@@ -32,7 +32,7 @@ namespace patt {
                 optmRet = Match(iBegin, iBegin);
             while (ptCur != nullptr) {
                 OptMatch
-                    optmCur = ptCur->Eval(istream, captures, usr_val);
+                    optmCur = ptCur->Eval(istream, groups, usr_val);
                 if (!optmCur)
                     return std::nullopt;
 
@@ -68,7 +68,7 @@ namespace patt {
         }
 
         OptMatch
-        patternString::normEval(io::IStream& istream, CaptureList&, const std::any&) {
+        patternString::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             for (char c : this->strPattern) {
@@ -88,7 +88,7 @@ namespace patt {
         }
 
         OptMatch
-        patternAny::normEval(io::IStream& istream, CaptureList&, const std::any&) {
+        patternAny::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             std::optional<std::byte>
@@ -117,14 +117,14 @@ namespace patt {
         }
 
         OptMatch
-        patternChoice::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternChoice::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             Pattern
                 ptCur   = this->lst.first();
             while (ptCur) {
                 OptMatch
-                    optm    = ptCur->Eval(istream, captures, usr_val);
+                    optm    = ptCur->Eval(istream, groups, usr_val);
                 if (optm)
                     return optm;
 
@@ -157,7 +157,7 @@ namespace patt {
         }
 
         OptMatch
-        patternSet::normEval(io::IStream& istream, CaptureList&, const std::any&) {
+        patternSet::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             std::optional<std::byte>
@@ -186,18 +186,18 @@ namespace patt {
         }
 
         OptMatch
-        patternRepeat::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternRepeat::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             for (size_t i = 0; i != this->uCount; ++i) {
-                if (!this->ptRepeat->Eval(istream, captures, usr_val))
+                if (!this->ptRepeat->Eval(istream, groups, usr_val))
                     return std::nullopt;
             }
 
             intptr_t
                 iEnd    = istream.GetPosition();
             while (true) {
-                if (!this->ptRepeat->Eval(istream, captures, usr_val)) {
+                if (!this->ptRepeat->Eval(istream, groups, usr_val)) {
                     istream.SetPosition(iEnd);
                     break;
                 }
@@ -209,13 +209,13 @@ namespace patt {
         }
 
         OptMatch
-        patternRepeat::negEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternRepeat::negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             for (size_t i = 0; i != this->uCount; ++i) {
                 intptr_t
                     iEnd    = istream.GetPosition();
-                if (!this->ptRepeat->Eval(istream, captures, usr_val)) {
+                if (!this->ptRepeat->Eval(istream, groups, usr_val)) {
                     istream.SetPosition(iEnd);
                     return Match(iBegin, iEnd);
                 }
@@ -241,11 +241,11 @@ namespace patt {
         }
 
         OptMatch
-        patternRepeatExact::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternRepeatExact::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             for (size_t i = 0; i != this->uCount; ++i) {
-                if (!this->ptRepeat->Eval(istream, captures, usr_val))
+                if (!this->ptRepeat->Eval(istream, groups, usr_val))
                     return std::nullopt;
             }
             intptr_t
@@ -267,7 +267,7 @@ namespace patt {
         }
 
         OptMatch
-        patternGrammar::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternGrammar::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
             const char*
                 szEnvVar        = std::getenv("TRACE_GRAMMAR");
@@ -284,7 +284,7 @@ namespace patt {
             }
 
             OptMatch
-                optm    = this->itPattern->second->Eval(istream, captures, usr_val);
+                optm    = this->itPattern->second->Eval(istream, groups, usr_val);
 
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
             if (bTraceGrammar) {
@@ -336,10 +336,10 @@ namespace patt {
         }
 
         OptMatch
-        patternHandler::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternHandler::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             OptMatch
-                optm    = this->ptHandle->Eval(istream, captures, usr_val);
-            this->fnCallback(istream, optm, captures, usr_val);
+                optm    = this->ptHandle->Eval(istream, groups, usr_val);
+            this->fnCallback(istream, optm, groups, usr_val);
             return optm;
         }
 
@@ -362,7 +362,7 @@ namespace patt {
         }
 
         OptMatch
-        patternCLocale::normEval(io::IStream& istream, CaptureList&, const std::any&) {
+        patternCLocale::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
 
@@ -385,11 +385,14 @@ namespace patt {
         }
 
         OptMatch
-        patternCapture::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternCapture::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             OptMatch
-                optm    = this->ptCapture->Eval(istream, captures, usr_val);
-            if (optm)
-                captures.push_back(*optm);
+                optm    = this->ptCapture->Eval(istream, groups, usr_val);
+            if (optm) {
+                if (groups.empty())
+                    groups.emplace_back();
+                groups.back().push_back(*optm);
+            }
             return optm;
         }
 
@@ -402,12 +405,12 @@ namespace patt {
         }
 
         OptMatch
-        patternLookAhead::normEval(io::IStream& istream, CaptureList& captures, const std::any& usr_val) {
+        patternLookAhead::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
 
             OptMatch
-                optm    = this->ptLookAhead->Eval(istream, captures, usr_val);
+                optm    = this->ptLookAhead->Eval(istream, groups, usr_val);
             istream.SetPosition(iBegin);
 
             return optm;

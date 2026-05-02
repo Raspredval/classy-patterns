@@ -22,6 +22,11 @@ namespace patt {
             this->lst.append(std::move(pt->lst));
         }
 
+        void
+        patternJoin::Prepend(Pattern&& pt) {
+            this->lst.prepend(std::move(pt));
+        }
+
         Pattern
         patternJoin::Clone() const {
             return std::make_shared<patternJoin>(*this);
@@ -52,6 +57,12 @@ namespace patt {
         operator>>(JoinPattern&& ptA, const Pattern& ptB) {
             ptA->Append(ptB);
             return ptA;
+        }
+
+        extern JoinPattern
+        operator>>(Pattern&& ptA, JoinPattern&& ptB) {
+            ptB->Prepend(std::move(ptA));
+            return ptB;
         }
 
         extern JoinPattern

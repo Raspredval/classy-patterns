@@ -31,6 +31,9 @@ namespace patt {
             Append(const Pattern& pt);
 
             void
+            Prepend(Pattern&& pt);
+
+            void
             Append(JoinPattern&& pt);
 
             [[nodiscard]] Pattern
@@ -50,6 +53,12 @@ namespace patt {
         [[nodiscard]]
         extern JoinPattern
         operator>>(JoinPattern&& ptA, const Pattern& ptB);
+
+        // join pattern; joins several patterns into a chain of patterns to be executed one after the other;
+        // stops execution if one of the patterns in the chain fails
+        [[nodiscard]]
+        extern JoinPattern
+        operator>>(Pattern&& ptA, JoinPattern&& ptB);
 
         // join pattern; joins several patterns into a chain of patterns to be executed one after the other;
         // stops execution if one of the patterns in the chain fails

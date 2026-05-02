@@ -58,6 +58,9 @@ namespace patt {
             void
             append(patternsList&& lst) noexcept;
 
+            void
+            prepend(Pattern&& pt) noexcept;
+
             Pattern
             first() const noexcept;
 

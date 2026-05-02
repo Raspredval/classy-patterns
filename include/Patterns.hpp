@@ -406,4 +406,12 @@ namespace patt {
     [[nodiscard]]
     extern Pattern
     PopCaptGr();
+
+    [[nodiscard]]
+    extern Pattern
+    CaptGr(const Pattern& ptCaptureFrom);
+
+    [[nodiscard]]
+    extern Pattern
+    CaptGr(Pattern&& ptCaptureFrom);
 }

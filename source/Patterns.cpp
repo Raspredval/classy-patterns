@@ -529,4 +529,14 @@ namespace patt {
         return std::make_shared<__impl::patternCaptureManip>(
             __impl::CaptureManip::PopGroup);
     }
+
+    extern Pattern
+    CaptGr(const Pattern& ptCaptureFrom) {
+        return PushCaptGr() >> ptCaptureFrom >> PopCaptGr();
+    }
+
+    extern Pattern
+    CaptGr(Pattern&& ptCaptureFrom) {
+        return PushCaptGr() >> std::move(ptCaptureFrom) >> PopCaptGr();
+    }
 }

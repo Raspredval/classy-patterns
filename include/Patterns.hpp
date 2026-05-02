@@ -408,10 +408,10 @@ namespace patt {
     PopCaptGr();
 
     [[nodiscard]]
-    extern Pattern
+    extern __impl::JoinPattern
     CaptGr(const Pattern& ptCaptureFrom);
 
     [[nodiscard]]
-    extern Pattern
+    extern __impl::JoinPattern
     CaptGr(Pattern&& ptCaptureFrom);
 }

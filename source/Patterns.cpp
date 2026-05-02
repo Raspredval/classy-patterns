@@ -530,12 +530,12 @@ namespace patt {
             __impl::CaptureManip::PopGroup);
     }
 
-    extern Pattern
+    extern __impl::JoinPattern
     CaptGr(const Pattern& ptCaptureFrom) {
         return PushCaptGr() >> ptCaptureFrom >> PopCaptGr();
     }
 
-    extern Pattern
+    extern __impl::JoinPattern
     CaptGr(Pattern&& ptCaptureFrom) {
         return PushCaptGr() >> std::move(ptCaptureFrom) >> PopCaptGr();
     }

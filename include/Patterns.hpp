@@ -414,24 +414,27 @@ namespace patt {
     extern Pattern
     Space();
 
-    // captures a successful match and appends it to the capture list
+    // captures a successful match and appends it to
+    // the current capture group on the top of the group stack
     [[nodiscard]]
     extern Pattern
     Capt(const Pattern& ptCapture);
 
+    // creates a new capture group and pushes it to
+    // the group stack
     [[nodiscard]]
     extern Pattern
     PushCaptGr();
 
+    // pops and destroys the current capture group at
+    // the top of the group stack, if there's any
     [[nodiscard]]
     extern Pattern
     PopCaptGr();
 
+    // little helper that wraps a pattern in a capture group,
+    // identical to PushCaptGr() >> ptCaptureFrom >> PopCaptGr()
     [[nodiscard]]
     extern __impl::JoinPattern
     CaptGr(const Pattern& ptCaptureFrom);
-
-    [[nodiscard]]
-    extern __impl::JoinPattern
-    CaptGr(Pattern&& ptCaptureFrom);
 }

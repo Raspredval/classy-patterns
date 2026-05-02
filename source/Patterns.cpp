@@ -556,9 +556,4 @@ namespace patt {
     CaptGr(const Pattern& ptCaptureFrom) {
         return PushCaptGr() >> ptCaptureFrom >> PopCaptGr();
     }
-
-    extern __impl::JoinPattern
-    CaptGr(Pattern&& ptCaptureFrom) {
-        return PushCaptGr() >> std::move(ptCaptureFrom) >> PopCaptGr();
-    }
 }

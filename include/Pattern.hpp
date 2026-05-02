@@ -55,6 +55,9 @@ namespace patt {
             void
             append(const Pattern& pt) noexcept;
 
+            void
+            append(patternsList&& lst) noexcept;
+
             Pattern
             first() const noexcept;
 

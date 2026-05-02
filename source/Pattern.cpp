@@ -44,6 +44,11 @@ namespace patt {
             this->ptLast = (this->ptLast->ptNext = pt);
         }
 
+        void
+        patternsList::append(patternsList&& lst) noexcept {
+            this->ptLast = (this->ptLast->ptNext = lst.first()), lst.last();
+        }
+
         Pattern
         patternsList::first() const noexcept {
             return this->ptRoot;

@@ -17,6 +17,11 @@ namespace patt {
         __impl::grammar;
 
     namespace __impl {
+        class patternJoin;
+
+        using JoinPattern   =
+            std::shared_ptr<__impl::patternJoin>;
+
         class patternJoin :
             public pattern {
         public:
@@ -24,6 +29,9 @@ namespace patt {
 
             void
             Append(const Pattern& pt);
+
+            void
+            Append(JoinPattern&& pt);
 
             [[nodiscard]] Pattern
             Clone() const override;
@@ -37,14 +45,17 @@ namespace patt {
                 lst;
         };
 
-        using JoinPattern   =
-            std::shared_ptr<__impl::patternJoin>;
-
         // join pattern; joins several patterns into a chain of patterns to be executed one after the other;
         // stops execution if one of the patterns in the chain fails
         [[nodiscard]]
         extern JoinPattern
         operator>>(JoinPattern&& ptA, const Pattern& ptB);
+
+        // join pattern; joins several patterns into a chain of patterns to be executed one after the other;
+        // stops execution if one of the patterns in the chain fails
+        [[nodiscard]]
+        extern JoinPattern
+        operator>>(JoinPattern&& ptA, JoinPattern&& ptB);
 
         // join pattern; joins several patterns into a chain of patterns to be executed one after the other;
         // stops execution if one of the patterns in the chain fails

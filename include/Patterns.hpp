@@ -243,7 +243,7 @@ namespace patt {
         class patternHandler :
             public pattern {
         public:
-            patternHandler(const Pattern& ptHandle, Callback fnCallback);
+            patternHandler(const Pattern& ptHandle, Callback lpfnCallback);
 
             [[nodiscard]] Pattern
             Clone() const override;
@@ -256,20 +256,14 @@ namespace patt {
             Pattern
                 ptHandle;
             Callback
-                fnCallback;
+                lpfnCallback;
         };
 
         // handler pattern; allows to insert code in between evaluation and observe the evaluation result of a pattern;
         // handler type signature: void (io::IStream&, const patt::OptMatch&, patt::CaptureList&, const std::any&)
         [[nodiscard]]
         extern Pattern
-        operator/(const Pattern& ptHandle, const Callback& fnCallback);
-
-        // handler pattern; allows to insert code in between evaluation and observe the evaluation result of a pattern;
-        // handler type signature: void (io::IStream&, const patt::OptMatch&, patt::CaptureList&, const std::any&)
-        [[nodiscard]]
-        extern Pattern
-        operator/(const Pattern& ptHandle, Callback&& fnCallback);
+        operator/(const Pattern& ptHandle, Callback lpfnCallback);
 
         using LocaleProc    =
             int(*)(int);

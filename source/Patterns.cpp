@@ -344,11 +344,11 @@ namespace patt {
                 this->getPatternIter("__eval"));
         }
 
-        patternHandler::patternHandler(const Pattern& ptHandle, Callback fnCallback) :
+        patternHandler::patternHandler(const Pattern& ptHandle, Callback lpfnCallback) :
             ptHandle(ptHandle),
-            fnCallback(fnCallback)
+            lpfnCallback(lpfnCallback)
         {
-            if (fnCallback == nullptr)
+            if (lpfnCallback == nullptr)
                 throw std::invalid_argument("invalid callback function pointer");
         }
 
@@ -361,18 +361,13 @@ namespace patt {
         patternHandler::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             OptMatch
                 optm    = this->ptHandle->Eval(istream, groups, usr_val);
-            this->fnCallback(istream, optm, groups, usr_val);
+            this->lpfnCallback(istream, optm, groups, usr_val);
             return optm;
         }
 
         extern Pattern
-        operator/(const Pattern& ptHandle, const Callback& fnCallback) {
-            return std::make_shared<patternHandler>(ptHandle, fnCallback);
-        }
-
-        extern Pattern
-        operator/(const Pattern& ptHandle, Callback&& fnCallback) {
-            return std::make_shared<patternHandler>(ptHandle, std::move(fnCallback));
+        operator/(const Pattern& ptHandle, Callback lpfnCallback) {
+            return std::make_shared<patternHandler>(ptHandle, lpfnCallback);
         }
 
         patternCLocale::patternCLocale(LocaleProc lpfn) :

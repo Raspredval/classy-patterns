@@ -238,13 +238,12 @@ namespace patt {
         };
 
         using Callback  =
-            std::function<void(io::IStream&, const OptMatch&, const CaptureGroupList&, const std::any&)>;
+            void(*)(io::IStream&, const OptMatch&, const CaptureGroupList&, const std::any&);
 
         class patternHandler :
             public pattern {
         public:
-            patternHandler(const Pattern& ptHandle, const Callback& fnCallback);
-            patternHandler(const Pattern& ptHandle, Callback&& fnCallback);
+            patternHandler(const Pattern& ptHandle, Callback fnCallback);
 
             [[nodiscard]] Pattern
             Clone() const override;

@@ -344,13 +344,13 @@ namespace patt {
                 this->getPatternIter("__eval"));
         }
 
-        patternHandler::patternHandler(const Pattern& ptHandle, const Callback& fnCallback) :
+        patternHandler::patternHandler(const Pattern& ptHandle, Callback fnCallback) :
             ptHandle(ptHandle),
-            fnCallback(fnCallback) {}
-
-        patternHandler::patternHandler(const Pattern& ptHandle, Callback&& fnCallback) :
-            ptHandle(ptHandle),
-            fnCallback(std::move(fnCallback)) {}
+            fnCallback(fnCallback)
+        {
+            if (fnCallback == nullptr)
+                throw std::invalid_argument("invalid callback function pointer");
+        }
 
         Pattern
         patternHandler::Clone() const {

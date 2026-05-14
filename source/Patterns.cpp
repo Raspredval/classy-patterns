@@ -141,9 +141,13 @@ namespace patt {
         OptMatch
         patternChoice::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
-                iBegin  = istream.GetPosition();
+                iBegin          = istream.GetPosition();
             Pattern
-                ptCur   = this->lst.first();
+                ptCur           = this->lst.first();
+            const size_t
+                uCurGroups      = groups.size(),
+                uCurCaptures    = (!groups.empty())
+                                    ? groups.back().size() : 0;
             while (ptCur) {
                 OptMatch
                     optm    = ptCur->Eval(istream, groups, usr_val);
@@ -152,6 +156,13 @@ namespace patt {
 
                 ptCur       = ptCur->ptNext;
                 istream.SetPosition(iBegin);
+
+                for (size_t i = uCurGroups; i < groups.size(); ++i)
+                    groups.pop_back();
+                if (!groups.empty()) {
+                    for (size_t i = uCurCaptures; i < groups.back().size(); ++i)
+                        groups.back().pop_back();
+                }
             }
 
             return std::nullopt;
@@ -413,35 +424,21 @@ namespace patt {
             return optm;
         }
 
-        patternCaptureManip::patternCaptureManip(CaptureManip iCmd) :
-            iCmd(iCmd) {};
+        patternCaptureGroup::patternCaptureGroup(const Pattern& ptCaptureFrom) :
+            ptCaptureFrom(ptCaptureFrom) {}
 
         Pattern
-        patternCaptureManip::Clone() const {
-            return std::make_shared<patternCaptureManip>(*this);
+        patternCaptureGroup::Clone() const {
+            return std::make_shared<patternCaptureGroup>(*this);
         }
 
         OptMatch
-        patternCaptureManip::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any&) {
-            intptr_t
-                iCurPos = istream.GetPosition();
-
-            switch (this->iCmd) {
-            case CaptureManip::PopGroup:
-                if (!groups.empty())
-                    groups.pop_back();
-                break;
-
-            case CaptureManip::PushGroup:
-                groups.emplace_back();
-                break;
-
-            default:
-                throw std::runtime_error(
-                    "invalid capture manip cmd");
-            }
-
-            return Match(iCurPos, iCurPos);
+        patternCaptureGroup::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+            groups.emplace_back();
+            OptMatch
+                optm    = this->ptCaptureFrom->Eval(istream, groups, usr_val);
+            groups.pop_back();
+            return optm;
         }
 
         patternLookAhead::patternLookAhead(const Pattern& ptLookAhead) :
@@ -536,19 +533,7 @@ namespace patt {
     }
 
     extern Pattern
-    PushCaptGr() {
-        return std::make_shared<__impl::patternCaptureManip>(
-            __impl::CaptureManip::PushGroup);
-    }
-
-    extern Pattern
-    PopCaptGr() {
-        return std::make_shared<__impl::patternCaptureManip>(
-            __impl::CaptureManip::PopGroup);
-    }
-
-    extern __impl::JoinPattern
     CaptGr(const Pattern& ptCaptureFrom) {
-        return PushCaptGr() >> ptCaptureFrom >> PopCaptGr();
+        return std::make_shared<__impl::patternCaptureGroup>(ptCaptureFrom);
     }
 }

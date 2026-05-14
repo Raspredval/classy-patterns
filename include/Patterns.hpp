@@ -302,15 +302,10 @@ namespace patt {
                 ptCapture;
         };
 
-        enum class CaptureManip {
-            PopGroup,
-            PushGroup
-        };
-
-        class patternCaptureManip :
+        class patternCaptureGroup :
             public pattern {
         public:
-            patternCaptureManip(CaptureManip iCmd);
+            patternCaptureGroup(const Pattern& ptCaptureFrom);
 
             [[nodiscard]] Pattern
             Clone() const override;
@@ -320,8 +315,8 @@ namespace patt {
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
-            CaptureManip
-                iCmd;
+            Pattern
+                ptCaptureFrom;
         };
 
         class patternLookAhead :
@@ -413,21 +408,10 @@ namespace patt {
     extern Pattern
     Capt(const Pattern& ptCapture);
 
-    // creates a new capture group and pushes it to
-    // the group stack
+    // isolates captures from a pattern to a pattern group,
+    // pushes a new capture group to the stack before executing the pattern
+    // and pops is after finishing executing the pattern
     [[nodiscard]]
     extern Pattern
-    PushCaptGr();
-
-    // pops and destroys the current capture group at
-    // the top of the group stack, if there's any
-    [[nodiscard]]
-    extern Pattern
-    PopCaptGr();
-
-    // little helper that wraps a pattern in a capture group,
-    // identical to PushCaptGr() >> ptCaptureFrom >> PopCaptGr()
-    [[nodiscard]]
-    extern __impl::JoinPattern
     CaptGr(const Pattern& ptCaptureFrom);
 }

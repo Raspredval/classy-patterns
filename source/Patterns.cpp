@@ -6,6 +6,30 @@
 
 namespace patt {
     namespace __impl {
+        struct captureCleanup {
+            captureCleanup(const patt::CaptureGroupList& groups) :
+                uCurGroups(groups.size()),
+                uCurCapts(0)
+            {
+                if (!groups.empty())
+                    this->uCurCapts = groups.back().size();
+            }
+
+            void
+            restore(patt::CaptureGroupList& groups) const {
+                for (size_t i = this->uCurGroups; i < groups.size(); ++i)
+                    groups.pop_back();
+                if (!groups.empty()) {
+                    for (size_t i = this->uCurCapts; i < groups.back().size(); ++i)
+                        groups.back().pop_back();
+                }
+            }
+
+            size_t
+                uCurGroups,
+                uCurCapts;
+        };
+
         patternJoin::patternJoin(const Pattern& ptA, const Pattern& ptB) :
             lst(ptA)
         {
@@ -141,13 +165,11 @@ namespace patt {
         OptMatch
         patternChoice::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
-                iBegin          = istream.GetPosition();
+                iBegin  = istream.GetPosition();
             Pattern
-                ptCur           = this->lst.first();
-            const size_t
-                uCurGroups      = groups.size(),
-                uCurCaptures    = (!groups.empty())
-                                    ? groups.back().size() : 0;
+                ptCur   = this->lst.first();
+            const captureCleanup
+                cleanup = {groups};
             while (ptCur) {
                 OptMatch
                     optm    = ptCur->Eval(istream, groups, usr_val);
@@ -157,12 +179,7 @@ namespace patt {
                 ptCur       = ptCur->ptNext;
                 istream.SetPosition(iBegin);
 
-                for (size_t i = uCurGroups; i < groups.size(); ++i)
-                    groups.pop_back();
-                if (!groups.empty()) {
-                    for (size_t i = uCurCaptures; i < groups.back().size(); ++i)
-                        groups.back().pop_back();
-                }
+                cleanup.restore(groups);
             }
 
             return std::nullopt;
@@ -454,10 +471,13 @@ namespace patt {
             intptr_t
                 iBegin  = istream.GetPosition();
 
+            const captureCleanup
+                cleanup = {groups};
             OptMatch
                 optm    = this->ptLookAhead->Eval(istream, groups, usr_val);
             istream.SetPosition(iBegin);
 
+            cleanup.restore(groups);
             return optm;
         }
 

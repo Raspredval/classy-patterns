@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(classy-patterns LANGUAGES CXX VERSION 0.3)
+project(classy-patterns LANGUAGES CXX VERSION 0.4)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

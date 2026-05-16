@@ -2,7 +2,6 @@ static_assert(__cplusplus >= 202302, "requires C++23 minimum version");
 
 #pragma once
 #include <classy-streams/IOStreams.hpp>
-#include <optional>
 #include <cstdint>
 #include <vector>
 #include <string>
@@ -10,7 +9,8 @@ static_assert(__cplusplus >= 202302, "requires C++23 minimum version");
 namespace patt {
     class Match {
     public:
-        Match(intptr_t iBegin, intptr_t iEnd);
+        Match(intptr_t iBegin, intptr_t iEnd, bool bFailed = false);
+        Match(intptr_t iBegin, size_t uSize, bool bFailed = false);
 
         intptr_t
         Begin() const noexcept;
@@ -24,6 +24,14 @@ namespace patt {
         bool
         Empty() const noexcept;
 
+        bool
+        Failed() const noexcept;
+
+        operator bool() const noexcept;
+
+        void
+        ToggleFailed() noexcept;
+
         Match&
         operator+=(const Match& m) noexcept;
 
@@ -35,11 +43,12 @@ namespace patt {
 
     private:
         intptr_t
-            iBegin, iEnd;
+            iBegin;
+        size_t
+            uSize   : sizeof(size_t) * 8 - 1,
+            bFailed : 1;
     };
 
-    using OptMatch      =
-        std::optional<Match>;
     using CaptureGroup  =
         std::vector<Match>;
     using CaptureGroupList  =

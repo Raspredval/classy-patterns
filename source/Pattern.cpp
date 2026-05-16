@@ -2,7 +2,7 @@
 
 namespace patt {
     namespace __impl {
-        OptMatch
+        Match
         pattern::Eval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             return (this->bNegated)
                 ? this->negEval(istream, groups, usr_val)
@@ -20,19 +20,12 @@ namespace patt {
             return -pt->Clone();
         }
 
-        OptMatch
+        Match
         pattern::negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
-            intptr_t
-                iCurPos = istream.GetPosition();
-            OptMatch
-                optm    = this->normEval(istream, groups, usr_val);
-            if (!optm) {
-                intptr_t
-                    iEndPos = istream.GetPosition();
-                return Match(iCurPos, iEndPos);
-            }
-            else
-                return std::nullopt;
+            Match
+                m   = this->normEval(istream, groups, usr_val);
+            m.ToggleFailed();
+            return m;
         }
 
         patternsList::patternsList(const Pattern& ptRoot) :
@@ -67,12 +60,12 @@ namespace patt {
         }
     }
 
-    extern OptMatch
+    extern Match
     Eval(io::IStream& istream, const Pattern& pt, CaptureGroupList& groups, const std::any& usr_val) {
         return pt->Eval(istream, groups, usr_val);
     }
 
-    extern OptMatch
+    extern Match
     Eval(io::IStream& istream, const Pattern& pt, const std::any& usr_val) {
         CaptureGroupList
             groups;

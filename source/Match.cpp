@@ -1,12 +1,6 @@
 #include "Match.hpp"
 
 namespace patt {
-    Match::Match(intptr_t iBegin, size_t uSize, bool bFailed) {
-        this->iBegin    = iBegin;
-        this->uSize     = uSize;
-        this->bFailed   = bFailed != 0;
-    }
-
     Match::Match(intptr_t iBegin, intptr_t iEnd, bool bFailed) {
         if (iBegin > iEnd)
             std::swap(iBegin, iEnd);
@@ -41,7 +35,7 @@ namespace patt {
     }
 
     Match::operator bool() const noexcept {
-        return this->Failed();
+        return !this->Failed();
     }
 
     void
@@ -54,6 +48,8 @@ namespace patt {
         intptr_t
             iNewEnd = m.End();
         this->uSize = (size_t)(iNewEnd - this->iBegin);
+        if (m.bFailed)
+            this->bFailed   = true;
         return *this;
     }
 

@@ -40,7 +40,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& capture_groups, const std::any& usr_val) override;
 
         private:
@@ -87,7 +87,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -104,7 +104,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
         };
 
@@ -120,7 +120,7 @@ namespace patt {
             Append(const Pattern& pt);
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -160,7 +160,7 @@ namespace patt {
             }
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -177,10 +177,10 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
-            OptMatch
+            Match
             negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -205,7 +205,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -229,7 +229,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -238,7 +238,7 @@ namespace patt {
         };
 
         using Callback  =
-            void(*)(io::IStream&, const OptMatch&, const CaptureGroupList&, const std::any&);
+            void(*)(io::IStream&, const Match&, const CaptureGroupList&, const std::any&);
 
         class patternHandler :
             public pattern {
@@ -249,7 +249,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -260,7 +260,7 @@ namespace patt {
         };
 
         // handler pattern; allows to insert code in between evaluation and observe the evaluation result of a pattern;
-        // handler type signature: void (io::IStream&, const patt::OptMatch&, patt::CaptureList&, const std::any&)
+        // handler type signature: void (io::IStream&, const patt::Match&, patt::CaptureList&, const std::any&)
         [[nodiscard]]
         extern Pattern
         operator/(const Pattern& ptHandle, Callback lpfnCallback);
@@ -277,7 +277,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -294,7 +294,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -311,7 +311,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:
@@ -328,7 +328,7 @@ namespace patt {
             Clone() const override;
 
         protected:
-            OptMatch
+            Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) override;
 
         private:

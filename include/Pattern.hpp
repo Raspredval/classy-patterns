@@ -24,7 +24,7 @@ namespace patt {
             virtual Pattern
             Clone() const = 0;
 
-            OptMatch
+            Match
             Eval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val);
 
             // pattern negation; inverts the evaluation result of the pattern
@@ -36,10 +36,10 @@ namespace patt {
             operator-(const Pattern& pt) noexcept;
 
         protected:
-            virtual OptMatch
+            virtual Match
             normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) = 0;
 
-            virtual OptMatch
+            virtual Match
             negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val);
 
             Pattern
@@ -75,10 +75,10 @@ namespace patt {
     }
 
     [[nodiscard]]
-    extern OptMatch
+    extern Match
     Eval(io::IStream& istream, const Pattern& pt, CaptureGroupList& groups, const std::any& usr_val = {});
 
     [[nodiscard]]
-    extern OptMatch
+    extern Match
     Eval(io::IStream& istream, const Pattern& pt, const std::any& usr_val = {});
 }

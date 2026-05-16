@@ -56,25 +56,22 @@ namespace patt {
             return std::make_shared<patternJoin>(*this);
         }
 
-        OptMatch
+        Match
         patternJoin::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
-            Pattern
-                ptCur   = lst.first();
             intptr_t
                 iBegin  = istream.GetPosition();
-            OptMatch
-                optmRet = Match(iBegin, iBegin);
+            Pattern
+                ptCur   = lst.first();
+            Match
+                mCur    = Match(iBegin, iBegin);
             while (ptCur != nullptr) {
-                OptMatch
-                    optmCur = ptCur->Eval(istream, groups, usr_val);
-                if (!optmCur)
-                    return std::nullopt;
-
-                *optmRet    += *optmCur;
-                ptCur       = ptCur->ptNext;
+                mCur    += ptCur->Eval(istream, groups, usr_val);
+                if (!mCur)
+                    break;
+                ptCur   = ptCur->ptNext;
             }
 
-            return optmRet;
+            return mCur;
         }
 
         extern JoinPattern
@@ -113,19 +110,18 @@ namespace patt {
             return std::make_shared<patternString>(*this);
         }
 
-        OptMatch
+        Match
         patternString::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
-            for (char c : this->strPattern) {
+            for (size_t i = 0; i != this->strPattern.size(); ++i) {
                 std::optional<std::byte>
                     optc    = istream.Read();
-                if (!optc || (char)*optc != c)
-                    return std::nullopt;
+                if (!optc || (char)*optc != strPattern[i])
+                    return Match(iBegin, iBegin + (intptr_t)(i + 1), true);
             }
-            intptr_t
-                iEnd    = istream.GetPosition();
-            return Match(iBegin, iEnd);
+
+            return Match(iBegin, iBegin + (intptr_t)strPattern.size());
         }
 
         Pattern
@@ -133,17 +129,15 @@ namespace patt {
             return std::make_shared<patternAny>(*this);
         }
 
-        OptMatch
+        Match
         patternAny::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             std::optional<std::byte>
                 optc    = istream.Read();
             if (!optc)
-                return std::nullopt;
-            intptr_t
-                iEnd    = istream.GetPosition();
-            return Match(iBegin, iEnd);
+                return Match(iBegin, iBegin, true);
+            return Match(iBegin, iBegin + 1);
         }
 
         patternChoice::patternChoice(const Pattern& ptA, const Pattern& ptB) :
@@ -162,7 +156,7 @@ namespace patt {
             this->lst.append(pt);
         }
 
-        OptMatch
+        Match
         patternChoice::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
@@ -170,8 +164,8 @@ namespace patt {
                 ptCur   = this->lst.first();
             const captureCleanup
                 cleanup = {groups};
-            while (ptCur) {
-                OptMatch
+            while (ptCur != nullptr) {
+                Match
                     optm    = ptCur->Eval(istream, groups, usr_val);
                 if (optm)
                     return optm;
@@ -182,7 +176,7 @@ namespace patt {
                 cleanup.restore(groups);
             }
 
-            return std::nullopt;
+            return Match(iBegin, iBegin, true);
         }
 
         extern ChoicePattern
@@ -206,19 +200,19 @@ namespace patt {
                 this->set.emplace(c);
         }
 
-        OptMatch
+        Match
         patternSet::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             std::optional<std::byte>
                 optc    = istream.Read();
 
-            if (!optc || !this->set.contains((char)*optc))
-                return std::nullopt;
+            if (!optc)
+                return Match(iBegin, iBegin, true);
+            if (!this->set.contains((char)*optc))
+                return Match(iBegin, iBegin + 1, true);
 
-            intptr_t
-                iEnd    = istream.GetPosition();
-            return Match(iBegin, iEnd);
+            return Match(iBegin, iBegin + 1);
         }
 
         patternRepeat::patternRepeat(const Pattern& ptRepeat, ssize_t iCount) :
@@ -235,45 +229,49 @@ namespace patt {
             return std::make_shared<patternRepeat>(*this);
         }
 
-        OptMatch
+        Match
         patternRepeat::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
+            Match
+                mCur    = Match(iBegin, iBegin);
             for (size_t i = 0; i != this->uCount; ++i) {
-                if (!this->ptRepeat->Eval(istream, groups, usr_val))
-                    return std::nullopt;
+                mCur    += this->ptRepeat->Eval(istream, groups, usr_val);
+                if (!mCur)
+                    return mCur;
             }
 
-            intptr_t
-                iEnd    = istream.GetPosition();
             while (true) {
-                if (!this->ptRepeat->Eval(istream, groups, usr_val)) {
-                    istream.SetPosition(iEnd);
+                Match
+                    mNext   = this->ptRepeat->Eval(istream, groups, usr_val);
+                if (!mNext) {
+                    istream.SetPosition(mCur.End());
                     break;
                 }
 
-                iEnd        = istream.GetPosition();
+                mCur        += mNext;
             }
 
-            return Match(iBegin, iEnd);
+            return mCur;
         }
 
-        OptMatch
+        Match
         patternRepeat::negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
+            Match
+                mCur    = Match(iBegin, iBegin);
             for (size_t i = 0; i != this->uCount; ++i) {
-                intptr_t
-                    iEnd    = istream.GetPosition();
-                if (!this->ptRepeat->Eval(istream, groups, usr_val)) {
-                    istream.SetPosition(iEnd);
-                    return Match(iBegin, iEnd);
+                Match
+                    mNext   = this->ptRepeat->Eval(istream, groups, usr_val);
+                if (!mNext) {
+                    istream.SetPosition(mCur.End());
+                    return mCur;
                 }
+                mCur        += mNext;
             }
 
-            intptr_t
-                iEnd    = istream.GetPosition();
-            return Match(iBegin, iEnd);
+            return mCur;
         }
 
         extern Pattern
@@ -290,17 +288,19 @@ namespace patt {
             return std::make_shared<patternRepeatExact>(*this);
         }
 
-        OptMatch
+        Match
         patternRepeatExact::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
+            Match
+                mCur    = Match(iBegin, iBegin);
             for (size_t i = 0; i != this->uCount; ++i) {
-                if (!this->ptRepeat->Eval(istream, groups, usr_val))
-                    return std::nullopt;
+                mCur    += this->ptRepeat->Eval(istream, groups, usr_val);
+                if (!mCur)
+                    break;
             }
-            intptr_t
-                iEnd    = istream.GetPosition();
-            return Match(iBegin, iEnd);
+
+            return mCur;
         }
 
         extern Pattern
@@ -316,7 +316,7 @@ namespace patt {
             return std::make_shared<patternGrammar>(*this);
         }
 
-        OptMatch
+        Match
         patternGrammar::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
             const char*
@@ -333,16 +333,16 @@ namespace patt {
                     std::string("rule \"") + this->itPattern->first + std::string("\" is defined but empty"));
             }
 
-            OptMatch
-                optm    = this->itPattern->second->Eval(istream, groups, usr_val);
+            Match
+                mCur    = this->itPattern->second->Eval(istream, groups, usr_val);
 
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
             if (bTraceGrammar) {
-                if (optm) {
+                if (mCur) {
                     io::cout
                         .put(this->itPattern->first)
                         .put(":\tmatched (");
-                    optm->ExportData(istream, io::std_output);
+                    mCur.ExportData(istream, io::std_output);
                     io::cout
                         .put(")\n");
                 }
@@ -354,7 +354,7 @@ namespace patt {
             }
             #endif
 
-            return optm;
+            return mCur;
         }
 
         template<>
@@ -385,9 +385,9 @@ namespace patt {
             return std::make_shared<patternHandler>(*this);
         }
 
-        OptMatch
+        Match
         patternHandler::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
-            OptMatch
+            Match
                 optm    = this->ptHandle->Eval(istream, groups, usr_val);
             this->lpfnCallback(istream, optm, groups, usr_val);
             return optm;
@@ -406,19 +406,19 @@ namespace patt {
             return std::make_shared<patternCLocale>(*this);
         }
 
-        OptMatch
+        Match
         patternCLocale::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
 
             std::optional<std::byte>
                 optc    = istream.Read();
-            if (!optc || !this->lpfn((int)*optc))
-                return std::nullopt;
+            if (!optc)
+                return Match(iBegin, iBegin, true);
+            if (!this->lpfn((int)*optc))
+                return Match(iBegin, iBegin + 1);
 
-            intptr_t
-                iEnd    = istream.GetPosition();
-            return Match(iBegin, iEnd);
+            return Match(iBegin, iBegin + 1);
         }
 
         patternCapture::patternCapture(const Pattern& ptCapture) :
@@ -429,16 +429,16 @@ namespace patt {
             return std::make_shared<patternCapture>(*this);
         }
 
-        OptMatch
+        Match
         patternCapture::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
-            OptMatch
-                optm    = this->ptCapture->Eval(istream, groups, usr_val);
-            if (optm) {
+            Match
+                mCur    = this->ptCapture->Eval(istream, groups, usr_val);
+            if (mCur) {
                 if (groups.empty())
                     groups.emplace_back();
-                groups.back().push_back(*optm);
+                groups.back().push_back(mCur);
             }
-            return optm;
+            return mCur;
         }
 
         patternCaptureGroup::patternCaptureGroup(const Pattern& ptCaptureFrom) :
@@ -449,13 +449,13 @@ namespace patt {
             return std::make_shared<patternCaptureGroup>(*this);
         }
 
-        OptMatch
+        Match
         patternCaptureGroup::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             groups.emplace_back();
-            OptMatch
-                optm    = this->ptCaptureFrom->Eval(istream, groups, usr_val);
+            Match
+                mCur    = this->ptCaptureFrom->Eval(istream, groups, usr_val);
             groups.pop_back();
-            return optm;
+            return mCur;
         }
 
         patternLookAhead::patternLookAhead(const Pattern& ptLookAhead) :
@@ -466,19 +466,15 @@ namespace patt {
             return std::make_shared<patternLookAhead>(*this);
         }
 
-        OptMatch
+        Match
         patternLookAhead::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
-            intptr_t
-                iBegin  = istream.GetPosition();
-
             const captureCleanup
                 cleanup = {groups};
-            OptMatch
-                optm    = this->ptLookAhead->Eval(istream, groups, usr_val);
-            istream.SetPosition(iBegin);
-
+            Match
+                mCur    = this->ptLookAhead->Eval(istream, groups, usr_val);
+            istream.SetPosition(mCur.Begin());
             cleanup.restore(groups);
-            return optm;
+            return mCur;
         }
 
         extern Pattern

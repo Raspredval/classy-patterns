@@ -10,7 +10,6 @@ namespace patt {
     class Match {
     public:
         Match(intptr_t iBegin, intptr_t iEnd, bool bFailed = false);
-        Match(intptr_t iBegin, size_t uSize, bool bFailed = false);
 
         intptr_t
         Begin() const noexcept;

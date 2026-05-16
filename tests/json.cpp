@@ -41,8 +41,8 @@ static const patt::Grammar
             g["numexp"]     = (patt::Set("+-") % -1) >> patt::Digit() % 1;
 
             g["__eval"]     = ((g["value"] % -1) >> patt::None()) /
-                [] (io::IStream& istream, const patt::OptMatch& optm, const patt::CaptureGroupList&, const std::any&) {
-                    if (!optm)
+                [] (io::IStream& istream, const patt::Match& m, const patt::CaptureGroupList&, const std::any&) {
+                    if (!m)
                         io::cerr.fmt("failed to parse JSON at {}\n", istream.GetPosition());
                     else
                         io::cout.put("success\n");
@@ -55,12 +55,9 @@ int
 main() {
     try {
         io::IFileStream
-            ifileTestJSON   = io::IFileStream("./assets/test.json");
+            ifileJSON   = io::IFileStream("./assets/test.json");
 
-        patt::OptMatch
-            optmJSON        = patt::Eval(ifileTestJSON, gramJSON);
-
-        return ((bool)optmJSON)
+        return (patt::Eval(ifileJSON, gramJSON))
             ? EXIT_SUCCESS : EXIT_FAILURE;
     }
     catch (const std::exception& err) {

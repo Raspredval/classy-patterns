@@ -416,7 +416,7 @@ namespace patt {
             if (!optc)
                 return Match(iBegin, iBegin, true);
             if (!this->lpfn((int)*optc))
-                return Match(iBegin, iBegin + 1);
+                return Match(iBegin, iBegin + 1, true);
 
             return Match(iBegin, iBegin + 1);
         }

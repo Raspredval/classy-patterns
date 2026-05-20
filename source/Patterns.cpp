@@ -347,7 +347,8 @@ namespace patt {
             return std::make_shared<patternGrammar>(this->itPattern);
         }
 
-        grammar::operator Pattern() const {
+        Pattern
+        grammar::GetDefaultRule() const {
             return std::make_shared<patternGrammar>(
                 this->getPatternIter("__eval"));
         }

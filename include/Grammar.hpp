@@ -51,6 +51,10 @@ namespace patt {
             const_accessor<const_gramm_iter>
             operator[](const std::string& strKey) const;
 
+            Pattern
+            GetDefaultRule() const;
+
+            explicit
             operator Pattern() const;
 
         private:

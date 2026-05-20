@@ -34,5 +34,9 @@ namespace patt {
 
             return itPattern;
         }
+
+        grammar::operator Pattern() const {
+            return this->GetDefaultRule();
+        }
     }
 }

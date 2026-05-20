@@ -12,7 +12,6 @@ namespace patt {
 
     // grammar; allows to name and execute groups of patterns;
     // named groups can be executed recursively, DOESNT CHECK FOR INFINITE RECURSION!
-    // also, can be converted to a pattern, returns a pattern group named '__eval'
     using Grammar   =
         __impl::grammar;
 

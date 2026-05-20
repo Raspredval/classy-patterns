@@ -57,7 +57,7 @@ main() {
         io::IFileStream
             ifileJSON   = io::IFileStream("./assets/test.json");
 
-        return (patt::Eval(ifileJSON, gramJSON))
+        return (patt::Eval(ifileJSON, (patt::Pattern)gramJSON))
             ? EXIT_SUCCESS : EXIT_FAILURE;
     }
     catch (const std::exception& err) {

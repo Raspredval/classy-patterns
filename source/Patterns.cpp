@@ -6,30 +6,6 @@
 
 namespace patt {
     namespace __impl {
-        struct captureCleanup {
-            captureCleanup(const patt::CaptureGroupList& groups) :
-                uCurGroups(groups.size()),
-                uCurCapts(0)
-            {
-                if (!groups.empty())
-                    this->uCurCapts = groups.back().size();
-            }
-
-            void
-            restore(patt::CaptureGroupList& groups) const {
-                for (size_t i = this->uCurGroups; i < groups.size(); ++i)
-                    groups.pop_back();
-                if (!groups.empty()) {
-                    for (size_t i = this->uCurCapts; i < groups.back().size(); ++i)
-                        groups.back().pop_back();
-                }
-            }
-
-            size_t
-                uCurGroups,
-                uCurCapts;
-        };
-
         patternJoin::patternJoin(const Pattern& ptA, const Pattern& ptB) :
             lst(ptA)
         {
@@ -159,11 +135,12 @@ namespace patt {
         Match
         patternChoice::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
             intptr_t
-                iBegin  = istream.GetPosition();
+                iBegin      = istream.GetPosition();
             Pattern
-                ptCur   = this->lst.first();
-            const captureCleanup
-                cleanup = {groups};
+                ptCur       = this->lst.first();
+            size_t
+                uCaptCount  = (!groups.empty())
+                                ? groups.back().size() : 0;
             while (ptCur != nullptr) {
                 Match
                     optm    = ptCur->Eval(istream, groups, usr_val);
@@ -173,7 +150,10 @@ namespace patt {
                 ptCur       = ptCur->ptNext;
                 istream.SetPosition(iBegin);
 
-                cleanup.restore(groups);
+                if (!groups.empty()) {
+                    while (groups.back().size() > uCaptCount)
+                        groups.back().pop_back();
+                }
             }
 
             return Match(iBegin, iBegin, true);
@@ -468,12 +448,16 @@ namespace patt {
 
         Match
         patternLookAhead::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
-            const captureCleanup
-                cleanup = {groups};
+            size_t
+                uCaptCount  = (!groups.empty())
+                                ? groups.back().size() : 0;
             Match
-                mCur    = this->ptLookAhead->Eval(istream, groups, usr_val);
+                mCur        = this->ptLookAhead->Eval(istream, groups, usr_val);
             istream.SetPosition(mCur.Begin());
-            cleanup.restore(groups);
+            if (!groups.empty()) {
+                while (groups.back().size() > uCaptCount)
+                    groups.back().pop_back();
+            }
             return mCur;
         }
 

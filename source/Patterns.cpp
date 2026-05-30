@@ -227,10 +227,18 @@ namespace patt {
             }
 
             while (true) {
+                size_t
+                    uCaptCount  = (!groups.empty())
+                                    ? groups.back().size() : 0;
                 Match
-                    mNext   = this->ptRepeat->Eval(istream, groups, usr_val);
+                    mNext       = this->ptRepeat->Eval(istream, groups, usr_val);
                 if (!mNext) {
                     istream.SetPosition(mCur.End());
+                    if (!groups.empty()) {
+                        while (groups.back().size() > uCaptCount)
+                            groups.back().pop_back();
+                    }
+
                     break;
                 }
 
@@ -247,10 +255,18 @@ namespace patt {
             Match
                 mCur    = Match(iBegin, iBegin);
             for (size_t i = 0; i != this->uCount; ++i) {
+                size_t
+                    uCaptCount  = (!groups.empty())
+                                    ? groups.back().size() : 0;
                 Match
                     mNext   = this->ptRepeat->Eval(istream, groups, usr_val);
                 if (!mNext) {
                     istream.SetPosition(mCur.End());
+                    if (!groups.empty()) {
+                        while (groups.back().size() > uCaptCount)
+                            groups.back().pop_back();
+                    }
+
                     return mCur;
                 }
                 mCur        += mNext;

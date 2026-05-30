@@ -1,7 +1,6 @@
 static_assert(__cplusplus >= 202302, "requires C++23 minimum version");
 
 #pragma once
-#include <span>
 #include <flat_set>
 #include "Pattern.hpp"
 #include "Grammar.hpp"

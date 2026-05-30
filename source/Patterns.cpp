@@ -180,6 +180,11 @@ namespace patt {
                 this->set.emplace(c);
         }
 
+        Pattern
+        patternSet::Clone() const {
+            return std::make_shared<patternSet>(*this);
+        }
+
         Match
         patternSet::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
             intptr_t

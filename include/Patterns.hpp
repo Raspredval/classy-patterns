@@ -154,9 +154,7 @@ namespace patt {
             patternSet(std::string_view strvSet);
 
             [[nodiscard]] Pattern
-            Clone() const override {
-                return std::make_shared<patternSet>(*this);
-            }
+            Clone() const override;
 
         protected:
             Match

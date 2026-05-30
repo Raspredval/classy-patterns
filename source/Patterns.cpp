@@ -33,7 +33,7 @@ namespace patt {
         }
 
         Match
-        patternJoin::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternJoin::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             Pattern
@@ -87,7 +87,7 @@ namespace patt {
         }
 
         Match
-        patternString::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
+        patternString::normEval(io::IStream& istream, std::vector<CaptureGroup>&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             for (size_t i = 0; i != this->strPattern.size(); ++i) {
@@ -106,7 +106,7 @@ namespace patt {
         }
 
         Match
-        patternAny::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
+        patternAny::normEval(io::IStream& istream, std::vector<CaptureGroup>&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             std::optional<std::byte>
@@ -133,7 +133,7 @@ namespace patt {
         }
 
         Match
-        patternChoice::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternChoice::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             intptr_t
                 iBegin      = istream.GetPosition();
             Pattern
@@ -186,7 +186,7 @@ namespace patt {
         }
 
         Match
-        patternSet::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
+        patternSet::normEval(io::IStream& istream, std::vector<CaptureGroup>&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
             std::optional<std::byte>
@@ -215,7 +215,7 @@ namespace patt {
         }
 
         Match
-        patternRepeat::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternRepeat::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             Match
@@ -241,7 +241,7 @@ namespace patt {
         }
 
         Match
-        patternRepeat::negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternRepeat::negEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             Match
@@ -274,7 +274,7 @@ namespace patt {
         }
 
         Match
-        patternRepeatExact::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternRepeatExact::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             intptr_t
                 iBegin  = istream.GetPosition();
             Match
@@ -302,7 +302,7 @@ namespace patt {
         }
 
         Match
-        patternGrammar::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternGrammar::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             #ifdef CLASSY_PATTERNS_TRACE_GRAMMAR
             const char*
                 szEnvVar        = std::getenv("TRACE_GRAMMAR");
@@ -372,10 +372,13 @@ namespace patt {
         }
 
         Match
-        patternHandler::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternHandler::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             Match
                 optm    = this->ptHandle->Eval(istream, groups, usr_val);
-            this->lpfnCallback(istream, optm, groups, usr_val);
+            CaptureGroupView
+                spnGrp  = (groups.empty())
+                            ? CaptureGroupView{} : groups.back();
+            this->lpfnCallback(istream, optm, spnGrp, usr_val);
             return optm;
         }
 
@@ -393,7 +396,7 @@ namespace patt {
         }
 
         Match
-        patternCLocale::normEval(io::IStream& istream, CaptureGroupList&, const std::any&) {
+        patternCLocale::normEval(io::IStream& istream, std::vector<CaptureGroup>&, const std::any&) {
             intptr_t
                 iBegin  = istream.GetPosition();
 
@@ -416,7 +419,7 @@ namespace patt {
         }
 
         Match
-        patternCapture::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternCapture::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             Match
                 mCur    = this->ptCapture->Eval(istream, groups, usr_val);
             if (mCur) {
@@ -437,12 +440,16 @@ namespace patt {
         }
 
         Match
-        patternCaptureGroup::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternCaptureGroup::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             groups.emplace_back();
             Match
                 mCur    = this->ptCaptureFrom->Eval(istream, groups, usr_val);
-            if (this->lpfnCallback)
-                this->lpfnCallback(istream, mCur, groups, usr_val);
+            if (this->lpfnCallback) {
+                CaptureGroupView
+                    spnGrp  = (groups.empty())
+                                ? CaptureGroupView{} : groups.back();
+                this->lpfnCallback(istream, mCur, spnGrp, usr_val);
+            }
             groups.pop_back();
             return mCur;
         }
@@ -456,7 +463,7 @@ namespace patt {
         }
 
         Match
-        patternLookAhead::normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        patternLookAhead::normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             size_t
                 uCaptCount  = (!groups.empty())
                                 ? groups.back().size() : 0;

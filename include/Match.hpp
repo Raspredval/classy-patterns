@@ -5,6 +5,7 @@ static_assert(__cplusplus >= 202302, "requires C++23 minimum version");
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <span>
 
 namespace patt {
     class Match {
@@ -50,6 +51,6 @@ namespace patt {
 
     using CaptureGroup  =
         std::vector<Match>;
-    using CaptureGroupList  =
-        std::vector<CaptureGroup>;
+    using CaptureGroupView =
+        std::span<const Match>;
 }

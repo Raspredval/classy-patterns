@@ -25,7 +25,7 @@ namespace patt {
             Clone() const = 0;
 
             Match
-            Eval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val);
+            Eval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val);
 
             // pattern negation; inverts the evaluation result of the pattern
             friend Pattern
@@ -37,10 +37,10 @@ namespace patt {
 
         protected:
             virtual Match
-            normEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) = 0;
+            normEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) = 0;
 
             virtual Match
-            negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val);
+            negEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val);
 
             Pattern
                 ptNext      = nullptr;
@@ -76,7 +76,7 @@ namespace patt {
 
     [[nodiscard]]
     extern Match
-    Eval(io::IStream& istream, const Pattern& pt, CaptureGroupList& groups, const std::any& usr_val = {});
+    Eval(io::IStream& istream, const Pattern& pt, std::vector<CaptureGroup>& groups, const std::any& usr_val = {});
 
     [[nodiscard]]
     extern Match

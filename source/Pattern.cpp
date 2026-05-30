@@ -3,7 +3,7 @@
 namespace patt {
     namespace __impl {
         Match
-        pattern::Eval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        pattern::Eval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             return (this->bNegated)
                 ? this->negEval(istream, groups, usr_val)
                 : this->normEval(istream, groups, usr_val);
@@ -21,7 +21,7 @@ namespace patt {
         }
 
         Match
-        pattern::negEval(io::IStream& istream, CaptureGroupList& groups, const std::any& usr_val) {
+        pattern::negEval(io::IStream& istream, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
             Match
                 m   = this->normEval(istream, groups, usr_val);
             m.ToggleFailed();
@@ -61,13 +61,13 @@ namespace patt {
     }
 
     extern Match
-    Eval(io::IStream& istream, const Pattern& pt, CaptureGroupList& groups, const std::any& usr_val) {
+    Eval(io::IStream& istream, const Pattern& pt, std::vector<CaptureGroup>& groups, const std::any& usr_val) {
         return pt->Eval(istream, groups, usr_val);
     }
 
     extern Match
     Eval(io::IStream& istream, const Pattern& pt, const std::any& usr_val) {
-        CaptureGroupList
+        std::vector<CaptureGroup>
             groups;
         return Eval(istream, pt, groups, usr_val);
     }

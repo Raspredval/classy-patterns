@@ -188,7 +188,7 @@ namespace patt {
         };
 
         // repeat pattern; if N is negative, then it repeats no more than N times;
-        // if N is not negative, then it repeats at least N times or more
+        // if N isn't negative, then it repeats at least N times or more
         [[nodiscard]]
         extern Pattern
         operator%(const patt::Pattern& ptA, ssize_t iCount);
@@ -257,7 +257,6 @@ namespace patt {
         };
 
         // handler pattern; allows to insert code in between evaluation and observe the evaluation result of a pattern;
-        // handler type signature: void (io::IStream&, const patt::Match&, patt::CaptureList&, const std::any&)
         [[nodiscard]]
         extern Pattern
         operator/(const Pattern& ptHandle, Callback lpfnCallback);
@@ -351,7 +350,7 @@ namespace patt {
     extern Pattern
     Any();
 
-    // doesnt match if there is at least one character left to match
+    // doesn't match if there is at least one character left to match
     [[nodiscard]]
     extern Pattern
     None();
@@ -409,7 +408,7 @@ namespace patt {
 
     // isolates captures from a pattern to a pattern group,
     // pushes a new capture group to the stack before executing the pattern
-    // and pops is after finishing executing the pattern
+    // and pops it after finishing executing the pattern
     [[nodiscard]]
     extern Pattern
     CaptGr(const Pattern& ptCaptureFrom, __impl::Callback lpfnCallback = nullptr);

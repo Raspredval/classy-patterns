@@ -304,7 +304,7 @@ namespace patt {
         class patternCaptureGroup :
             public pattern {
         public:
-            patternCaptureGroup(const Pattern& ptCaptureFrom);
+            patternCaptureGroup(const Pattern& ptCaptureFrom, Callback lpfnCallback);
 
             [[nodiscard]] Pattern
             Clone() const override;
@@ -316,6 +316,8 @@ namespace patt {
         private:
             Pattern
                 ptCaptureFrom;
+            Callback
+                lpfnCallback;
         };
 
         class patternLookAhead :
@@ -412,5 +414,5 @@ namespace patt {
     // and pops is after finishing executing the pattern
     [[nodiscard]]
     extern Pattern
-    CaptGr(const Pattern& ptCaptureFrom);
+    CaptGr(const Pattern& ptCaptureFrom, __impl::Callback lpfnCallback = nullptr);
 }

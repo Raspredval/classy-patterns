@@ -422,8 +422,9 @@ namespace patt {
             return mCur;
         }
 
-        patternCaptureGroup::patternCaptureGroup(const Pattern& ptCaptureFrom) :
-            ptCaptureFrom(ptCaptureFrom) {}
+        patternCaptureGroup::patternCaptureGroup(const Pattern& ptCaptureFrom, Callback lpfnCallback) :
+            ptCaptureFrom(ptCaptureFrom),
+            lpfnCallback(lpfnCallback) {}
 
         Pattern
         patternCaptureGroup::Clone() const {
@@ -435,6 +436,8 @@ namespace patt {
             groups.emplace_back();
             Match
                 mCur    = this->ptCaptureFrom->Eval(istream, groups, usr_val);
+            if (this->lpfnCallback)
+                this->lpfnCallback(istream, mCur, groups, usr_val);
             groups.pop_back();
             return mCur;
         }
@@ -534,7 +537,8 @@ namespace patt {
     }
 
     extern Pattern
-    CaptGr(const Pattern& ptCaptureFrom) {
-        return std::make_shared<__impl::patternCaptureGroup>(ptCaptureFrom);
+    CaptGr(const Pattern& ptCaptureFrom, __impl::Callback lpfnCallback) {
+        return std::make_shared<__impl::patternCaptureGroup>(
+            ptCaptureFrom, lpfnCallback);
     }
 }

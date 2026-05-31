@@ -440,7 +440,7 @@ namespace patt {
                 mCur    = this->ptCapture->Eval(istream, groups, usr_val);
             if (mCur) {
                 if (groups.empty())
-                    groups.emplace_back();
+                    throw std::runtime_error("trying to capture patterns without a capture group");
                 groups.back().push_back(mCur);
             }
             return mCur;
